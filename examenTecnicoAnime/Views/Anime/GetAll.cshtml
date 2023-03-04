@@ -1,0 +1,52 @@
+﻿@model Anime
+@{
+    ViewData["Title"] = "GetAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Catalogo</h1>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div style="float:right;">
+        </div>
+    </div>
+    <br> <br />
+</div>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <table class="table table-bordered table-responsive table-dark table-hover" id="tblAnime" )>
+            <thead class="table-light">
+                <tr>
+                    <td>Id</td>
+                    <td>Gid</td>
+                    <td>Type</td>
+                    <td>Name</td>
+                    <td>Precision</td>
+                    <td>Vintage</td>
+                   
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (Anime anime in Model.Animes)
+                {
+                    <tr>
+
+                        <td>@anime.Id</td>
+                        <td>@anime.Gid </td>
+                        <td>@anime.Type</td>
+                        <td>@anime.Name</td>
+                        <td>@anime.Precision</td>
+                        <td>@anime.Vintage</td>
+                        @*<td class="text-center"><a class="btn btn-light" href="@Url.Action("Add", "Anime", new { id = anime.Id, gid = anime.Gid, name = anime.Name , anime.Precision, anime.Vintage})"><i class="fa-regular fa-heart fa-beat" style="color: red;"></i></a> </td>*@
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

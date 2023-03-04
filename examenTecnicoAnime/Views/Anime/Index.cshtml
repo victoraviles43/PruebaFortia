@@ -1,0 +1,142 @@
+﻿@model Anime
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 style="color:red">Catalogos de Anime y Manga</h1>
+ <p>Ingrese un anime o manga </p>
+<hr />
+<div class="container">
+    <div class="align-content-center">
+        @using (Html.BeginForm("Busqueda", "Anime", FormMethod.Get, new { enctype = "multipart/form-data" }))
+        {
+            <div class="row">
+                <div class="col-md-3">
+                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @id = "txtNombre", @autocomplete = "off", @placeholder = "Titulo" })
+                    @Html.HiddenFor(model => model.Descripcion,  new {id = "IdHidden", value = "" })
+                </div>
+                
+                <div class="col-md-3">
+
+                    <button type="submit" class="btn btn-dark" onclick="BuscarManga()">Buscar Mangas  <i class="fa-solid fa-book"></i> </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-dark" onclick="BuscarAnime()">Buscar Animes <i class="fa-solid fa-ticket"></i> </button>
+
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div style="float:right;">
+        </div>
+    </div>
+    <br> <br />
+</div>
+
+@if (Model.Result == true)
+{
+    <div class="row">
+        @foreach (Anime anime in Model.Animes)
+        {
+            <div class="col mt-3 pt-3">
+                <div class="card text-white bg-dark border-success  mb-3 border-4 " style="width: 18rem;">
+                    <img src="@anime.Imagen" class="card-img-top" style=" height:50%; width:100%;">
+                    <div class="card-body ">
+                        <h5 class="card-title card-header text-center bg-secondary" id="pNombre">@anime.Name</h5>
+                        <p class="card-text" id="pCreditos"> @anime.Descripcion</p>
+                        <p class="card-text" style="display: none;" id="pIdMateria"> @anime.Id</p>
+                        <p class="card-text" style="display: none;" id="pIdMateria"> @anime.Gid</p>
+                        <p class="card-text" style="display: none;" id="pIdMateria"> @anime.Precision</p>
+                        <p class="card-text" style="display: none;" id="pIdMateria"> @anime.Vintage</p>
+                        <p class="card-text" style="display: none;" id="pIdMateria"> @anime.Type</p>
+                        <a class="btn btn-light" href="@Url.Action("Add", "Anime", new {   id = anime.Id, gid = anime.Gid, name = anime.Name , anime.Precision, anime.Vintage,anime.Type })"><i class="fa-regular fa-heart fa-beat" style="color: red;"></i> Agregar a Favoritos</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+else
+{
+    
+<div class="row">
+    <div class="col-lg-12">
+        <table class="table table-bordered table-responsive table-dark table-hover" id="tblAnime" )>
+            <thead class="table-light">
+                <tr>
+                    <td>Id</td>
+                    <td>Gid</td>
+                    <td>Type</td>
+                    <td>Name</td>
+                    <td>Precision</td>
+                    <td>Vintage</td>
+                    <td>Añadir</td>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (Anime anime in Model.Animes)
+                {
+                    <tr>
+
+                        <td>@anime.Id</td>
+                        <td>@anime.Gid </td>
+                        <td>@anime.Type</td>
+                        <td>@anime.Name</td>
+                        <td>@anime.Precision</td>
+                        <td>@anime.Vintage</td>
+                        <td class="text-center"><a class="btn btn-light" href="@Url.Action("Add", "Anime", new { id = anime.Id, gid = anime.Gid, name = anime.Name , anime.Precision, anime.Vintage})"><i class="fa-regular fa-heart fa-beat" style="color: red;"></i></a> </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+    
+}
+
+
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.material.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#tblAnime').DataTable({
+                searching: false,
+                "lengthMenu": [[10, 10, 15, 20, -1], [10, 15, 20, 25, "All"]],
+                autoWidth: false,
+                columnDefs: [
+                    {
+                        targets: ['_all'],
+                        className: 'mdc-data-table__cell',
+                    },
+                ],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
+                },
+             });
+        });
+
+           function BuscarManga(){
+        $("#IdHidden").val("manga");
+    }
+    function BuscarAnime(){
+        $("#IdHidden").val("anime");
+    }
+    </script>
+}

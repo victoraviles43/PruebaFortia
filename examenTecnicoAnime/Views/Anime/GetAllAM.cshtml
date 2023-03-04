@@ -1,0 +1,87 @@
+﻿@model Result
+@{
+    ViewData["Title"] = "GetAllAM";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 style="color:red">Catalogo de Animes Favoritos </h1>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <div style="float:right;">
+        </div>
+    </div>
+    <br> <br />
+</div>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <table class="table table-bordered table-responsive table-dark table-hover" id="tblAnime" )>
+            <thead class="table-light">
+                <tr>
+                    <td>Id</td>
+                    <td>Gid</td>
+                    <td>Type</td>
+                    <td>Name</td>
+                    <td>Precision</td>
+                    <td>Vintage</td>
+                    <td>Eliminar</td>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (Anime anime in Model.anime.Animes)
+                {
+                    <tr>
+
+                        <td>@anime.Id</td>
+                        <td>@anime.Gid </td>
+                        <td>@anime.Type</td>
+                        <td>@anime.Name</td>
+                        <td>@anime.Precision</td>
+                        <td>@anime.Vintage</td>
+                        @*<td class="text-center"><a class="btn btn-light" href="@Url.Action("Add", "Anime", new { id = anime.Id, gid = anime.Gid, name = anime.Name , anime.Precision, anime.Vintage})"><i class="fa-regular fa-heart fa-beat" style="color: red;"></i></a> </td>*@
+                        <td><a class="btn btn-danger bi bi-x-circle-fill" href="@Url.Action("Delete", "Anime", new { id = anime.Gid })" onclick="return confirm('¿Estas seguro que deseas eliminar este registro?');"></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <h1 style="color:slateblue">Catalogo de Mangas Favoritos</h1>
+    <div class="col-lg-12">
+        <table class="table table-bordered table-responsive table-dark table-hover" id="tblAnime" )>
+            <thead class="table-light">
+                <tr>
+                    <td>Id</td>
+                    <td>Gid</td>
+                    <td>Type</td>
+                    <td>Name</td>
+                    <td>Precision</td>
+                    <td>Vintage</td>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (Anime anime in Model.anime.Mangas)
+                {
+                    <tr>
+
+                        <td>@anime.Id</td>
+                        <td>@anime.Gid </td>
+                        <td>@anime.Type</td>
+                        <td>@anime.Name</td>
+                        <td>@anime.Precision</td>
+                        <td>@anime.Vintage</td>
+                        @*<td class="text-center"><a class="btn btn-light" href="@Url.Action("Add", "Anime", new { id = anime.Id, gid = anime.Gid, name = anime.Name , anime.Precision, anime.Vintage})"><i class="fa-regular fa-heart fa-beat" style="color: red;"></i></a> </td>*@
+                        <td><a class="btn btn-danger bi bi-x-circle-fill" href="@Url.Action("Delete", "Anime", new { id = anime.Id })" onclick="return confirm('¿Estas seguro que deseas eliminar este registro?');"></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
