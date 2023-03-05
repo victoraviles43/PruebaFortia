@@ -28,16 +28,16 @@ namespace examenTecnicoAnime.Controllers
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
         }
-        //string urlApi = "https://cdn.animenewsnetwork.com/encyclopedia/reports.xml?id=177\r\nhttps://cdn.animenewsnetwork.com/encyclopedia/reports.xml?id=155&t\r\nype=anime&nlist=all";
+      
         public async Task<ActionResult> GetAllAsync()
         {
-            //Anime = new List<Object>();
+            
             Models.Anime anime = new Models.Anime();
             anime.Animes = new List<Object>();
 
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri("https://cdn.animenewsnetwork.com/encyclopedia/reports.xml?id=155&t\r\nype=anime&nlist=50");
+                client.BaseAddress = new Uri(_configuration["WebAPI"]);
                 var response = client.GetAsync(client.BaseAddress);
                 response.Wait();
 
@@ -47,7 +47,7 @@ namespace examenTecnicoAnime.Controllers
                 XmlDocument xmlDocument = new XmlDocument();
                 xmlDocument.LoadXml(readTask.Result);
 
-                //foreach (var resultItem in resultJSON)
+               
                 foreach (XmlNode resultItem in xmlDocument.SelectNodes("//item"))
                 {
                     examenTecnicoAnime.Models.Anime anime1 = new examenTecnicoAnime.Models.Anime();
@@ -57,7 +57,7 @@ namespace examenTecnicoAnime.Controllers
                     anime1.Type = resultItem.SelectSingleNode("type").InnerText;
                     anime1.Name = resultItem.SelectSingleNode("name").InnerText;
                     anime1.Precision = resultItem.SelectSingleNode("precision").InnerText;
-                    //anime1.vintage = resultItem.SelectSingleNode("vintage").InnerText;
+                
                     if (resultItem.SelectSingleNode("vintage") == null)
                     {
                         anime.Vintage = "";
@@ -78,7 +78,7 @@ namespace examenTecnicoAnime.Controllers
 
             }
             return View("Index", anime);
-            //return RedirectToAction("Index", "Home");
+           
         }
         [HttpGet]
         public ActionResult Add(Models.Anime anime)
@@ -100,7 +100,7 @@ namespace examenTecnicoAnime.Controllers
 
                     if (query > 0)
                     {
-                        ViewBag.Message = "Se ha registrado correctaente el producto";
+                        ViewBag.Message = "Se ha registrado correctaente el elemento";
                         return PartialView("Modal");
                     }
                     else
@@ -138,7 +138,7 @@ namespace examenTecnicoAnime.Controllers
                     {
                         foreach (var obj in query)
                         {
-                            //ML.Alumnos alumnos = new ML.Alumnos();
+                            
                             examenTecnicoAnime.Models.Anime animes = new examenTecnicoAnime.Models.Anime();
 
 
@@ -159,7 +159,7 @@ namespace examenTecnicoAnime.Controllers
                     {
                         foreach (var obj in querymanga)
                         {
-                            //ML.Alumnos alumnos = new ML.Alumnos();
+                            
                             examenTecnicoAnime.Models.Anime mangas = new examenTecnicoAnime.Models.Anime();
 
 
@@ -189,7 +189,7 @@ namespace examenTecnicoAnime.Controllers
                 result.Ex = ex;
             }
             return View("GetAllAM", result);
-            //return RedirectToAction("GetAllAM");
+            
 
         }
 
@@ -214,7 +214,7 @@ namespace examenTecnicoAnime.Controllers
                     else
                     {
                         result.Correct = false;
-                        result.ErrorMessage = "No se actualizó el status de la credencial";
+                        result.ErrorMessage = "No se elimino";
                     }
                 }
             }
@@ -237,12 +237,12 @@ namespace examenTecnicoAnime.Controllers
                 string tipo = "";
                 if (anime.Descripcion == "anime")
                 {
-                    client.BaseAddress = new Uri("https://cdn.animenewsnetwork.com/encyclopedia/api.xml?anime=" + "~" + anime.Name);
+                    client.BaseAddress = new Uri(_configuration["WebAPIAnime"] + "~" + anime.Name);
                     tipo = "anime";
                 }
                 else
                 {
-                    client.BaseAddress = new Uri("https://cdn.animenewsnetwork.com/encyclopedia/api.xml?manga=" + "~" + anime.Name);
+                    client.BaseAddress = new Uri(_configuration["WebAPIManga"] + "~" + anime.Name);
                     tipo = "manga";
                 }
 
