@@ -3,17 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System;
-using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-using System.Dynamic;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System.Xml;
 using DL;
 using Microsoft.EntityFrameworkCore;
-using BL;
 using System.Xml.Linq;
 
 namespace examenTecnicoAnime.Controllers
@@ -49,7 +46,7 @@ namespace examenTecnicoAnime.Controllers
                 var readTask = result.Content.ReadAsStringAsync();
                 XmlDocument xmlDocument = new XmlDocument();
                 xmlDocument.LoadXml(readTask.Result);
-                dynamic resultJSON = xmlDocument.DocumentElement;
+
                 //foreach (var resultItem in resultJSON)
                 foreach (XmlNode resultItem in xmlDocument.SelectNodes("//item"))
                 {
@@ -113,7 +110,7 @@ namespace examenTecnicoAnime.Controllers
                     }
                 }
             }
-             catch (Exception ex)
+            catch (Exception ex)
             {
                 result.Correct = false;
                 result.ErrorMessage = ex.Message;
@@ -123,7 +120,7 @@ namespace examenTecnicoAnime.Controllers
         }
         [HttpGet]
         public ActionResult GetAllAM()
-        
+
         {
             Result result = new Result();
             result.anime = new Models.Anime();
@@ -133,7 +130,7 @@ namespace examenTecnicoAnime.Controllers
                 {
                     var query = context.Animes.FromSqlRaw("AnimeGetAll").ToList();
                     var querymanga = context.Mangas.FromSqlRaw("MangaGetAll").ToList();
-                    
+
                     result.anime.Animes = new List<object>();
                     result.anime.Mangas = new List<object>();
 
@@ -191,7 +188,7 @@ namespace examenTecnicoAnime.Controllers
                 result.ErrorMessage = ex.Message;
                 result.Ex = ex;
             }
-            return View("GetAllAM",result);
+            return View("GetAllAM", result);
             //return RedirectToAction("GetAllAM");
 
         }
@@ -208,7 +205,7 @@ namespace examenTecnicoAnime.Controllers
                 {
                     int query = 0;
                     query = context.Database.ExecuteSqlRaw($"DeleteManga '{anime.Id}'");
-                    
+
 
                     if (query >= 1)
                     {
@@ -249,48 +246,55 @@ namespace examenTecnicoAnime.Controllers
                     tipo = "manga";
                 }
 
-                var response = client.GetAsync(client.BaseAddress);
-                response.Wait();
-
-                var result = response.Result;
-                if (result.IsSuccessStatusCode)
+                using (var response = client.GetAsync(client.BaseAddress))
                 {
+                    response.Wait();
 
-                    var readTask = result.Content.ReadAsStringAsync();
-                    XmlDocument xmlDocument = new XmlDocument();
-                    xmlDocument.LoadXml(readTask.Result);
-                    foreach (XmlNode resultItem in xmlDocument.SelectNodes("//" + tipo))
+                    var result = response.Result;
+                    if (result.IsSuccessStatusCode)
                     {
-                        Models.Anime anime1 = new Models.Anime();
 
-                        anime1.Imagen = resultItem.SelectSingleNode("/ann/" + tipo + "/info[@type='Picture']").Attributes["src"].Value;
-                        anime1.Descripcion = resultItem.SelectSingleNode("/ann/" + tipo + "/info[@type='Plot Summary']").InnerText;
-                        anime1.Id = resultItem.SelectSingleNode("/ann/" + tipo + "").Attributes["id"].Value;
-                        anime1.Name = resultItem.SelectSingleNode("/ann/" + tipo + "").Attributes["name"].Value;
-                        anime1.Creador = resultItem.SelectSingleNode("/ann/" + tipo + "/staff/person").InnerText;
-                        anime1.Gid = resultItem.SelectSingleNode("/ann/" + tipo + "").Attributes["gid"].Value;
-                        anime1.Precision = resultItem.SelectSingleNode("/ann/" + tipo + "").Attributes["precision"].Value;
-                        if (resultItem.SelectSingleNode("/ann/" + tipo + "/info[@type='Vintage']") == null)
+                        var readTask = result.Content.ReadAsStringAsync();
+                        XmlDocument xmlDocument = new XmlDocument();
+                        xmlDocument.LoadXml(readTask.Result);
+                        var prueba = xmlDocument.SelectNodes("//" + tipo);
+                        foreach (XmlNode resultItem in prueba)
                         {
-                            anime1.Vintage = "";
+                            Models.Anime anime1 = new Models.Anime();
+
+                            anime1.Gid = resultItem.Attributes["gid"].Value;
+                            anime1.Gid = resultItem.Attributes["type"].Value;
+                            anime1.Name = resultItem.Attributes["name"].Value;
+                            anime1.Precision = resultItem.Attributes["precision"].Value;
+                            anime1.Creador = resultItem.SelectSingleNode("staff/person").InnerText;
+                            anime1.Id = resultItem.Attributes["id"].Value;
+                            if (resultItem.SelectSingleNode("info[@type='Plot Summary']") == null)
+                            {
+                                anime1.Descripcion = tipo + " Sin Descripción";
+
+                            }
+
+                            else
+                            {
+                                anime1.Descripcion = resultItem.SelectSingleNode("info[@type='Plot Summary']").InnerText;
+                            }
+                            if (resultItem.SelectSingleNode("info[@type = 'Picture'] / img / @src") == null)
+                            {
+                                anime1.Imagen = "https://islandpress.org/sites/default/files/default_book_cover_2015.jpg";
+                            }
+                            else
+                            {
+                                anime1.Imagen = resultItem.SelectSingleNode("info[@type = 'Picture'] / img / @src").Value;
+                            }
+
+                            anime.Animes.Add(anime1);
+                            anime.Result = true;
                         }
-                        else
-                        {
-                            anime1.Vintage = resultItem.SelectSingleNode("/ann/" + tipo + "/info[@type='Vintage']").InnerText;
-                        }
-
-                        anime1.Type = resultItem.SelectSingleNode("/ann/" + tipo + "").Attributes["type"].Value;
-
-
-
-
-                        anime.Animes.Add(anime1);
-                        anime.Result = true;
                     }
-                }
-                else
-                {
-                    return View("Index", anime);
+                    else
+                    {
+                        return View("Index", anime);
+                    }
                 }
             }
             return View("Index", anime);
